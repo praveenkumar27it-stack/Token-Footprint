@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../styles/shared.css">
+  <link rel="stylesheet" href="popup.css">
+  <title>Token Footprint</title>
+</head>
+<body>
+  <div class="pf-popup">
+
+    <!-- Header -->
+    <div class="pf-header">
+      <div class="pf-brand">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--pf-accent-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>
+        </svg>
+        <span class="pf-brand-name">Token Footprint</span>
+      </div>
+      <div class="pf-status" id="pf-status">
+        <span class="pf-status-dot"></span>
+        <span class="pf-status-text">Inactive</span>
+      </div>
+    </div>
+
+    <!-- Personalized greeting (shown when a name is known) -->
+    <div class="pf-greeting" id="pf-greeting" hidden>Hello, <span id="pf-greeting-name"></span></div>
+
+    <!-- Live model detection + projected impact for the prompt being written -->
+    <div class="pf-section pf-model-section" id="pf-model-section" hidden>
+      <div class="pf-section-label">Current model</div>
+      <div class="pf-model-head">
+        <span class="pf-model-provider" id="pf-model-provider">—</span>
+        <span class="pf-model-badge" id="pf-model-evidence"></span>
+      </div>
+      <div class="pf-model-name" id="pf-model-name">Detecting…</div>
+      <div class="pf-model-metrics">
+        <div class="pf-model-metric">
+          <span class="pf-model-val" id="pf-model-tokens">—</span>
+          <span class="pf-model-lbl">Input tokens</span>
+        </div>
+        <div class="pf-model-metric">
+          <span class="pf-model-val" id="pf-model-avoided">—</span>
+          <span class="pf-model-lbl">Potential input tokens avoided</span>
+        </div>
+        <div class="pf-model-metric pf-model-metric-wide">
+          <span class="pf-model-val" id="pf-model-energy">—</span>
+          <span class="pf-model-lbl" id="pf-model-energy-lbl">Projected interaction range</span>
+        </div>
+      </div>
+      <div class="pf-model-note" id="pf-model-change" hidden></div>
+      <button class="pf-model-toggle" id="pf-model-toggle" aria-expanded="false">Details</button>
+      <div class="pf-model-details" id="pf-model-details" hidden></div>
+    </div>
+
+    <!-- This Week -->
+    <div class="pf-section">
+      <div class="pf-section-label">This Week's Impact</div>
+
+      <div class="pf-cards">
+        <!-- Tokens (row spanning) -->
+        <div class="pf-card pf-card-tokens">
+          <div class="pf-card-icon pf-icon-tokens">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line>
+            </svg>
+          </div>
+          <div class="pf-card-main" id="pf-tokens">—</div>
+          <div class="pf-card-sub">tokens sent</div>
+        </div>
+
+        <!-- Water -->
+        <div class="pf-card pf-card-water">
+          <div class="pf-card-icon pf-icon-water">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>
+            </svg>
+          </div>
+          <div class="pf-card-main" id="pf-water">—</div>
+          <div class="pf-card-sub" id="pf-water-sub">of water</div>
+        </div>
+
+        <!-- Energy -->
+        <div class="pf-card pf-card-energy">
+          <div class="pf-card-icon pf-icon-energy">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="pf-card-main" id="pf-energy">—</div>
+          <div class="pf-card-sub" id="pf-energy-sub">of energy</div>
+        </div>
+
+        <!-- CO₂ -->
+        <div class="pf-card pf-card-co2">
+          <div class="pf-card-icon pf-icon-co2">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
+            </svg>
+          </div>
+          <div class="pf-card-main" id="pf-co2">—</div>
+          <div class="pf-card-sub" id="pf-co2-sub">CO₂</div>
+        </div>
+      </div>
+
+      <!-- Personal average prompt size -->
+      <div class="pf-avg" id="pf-avg">Your average prompt: —</div>
+    </div>
+
+    <!-- Overlay toggle -->
+    <div class="pf-setting">
+      <span class="pf-setting-label">Show overlay on AI chats</span>
+      <label class="pf-toggle">
+        <input type="checkbox" id="pf-overlay-toggle" checked>
+        <span class="pf-toggle-track">
+          <span class="pf-toggle-thumb"></span>
+        </span>
+      </label>
+    </div>
+
+    <!-- In-page assistant master switch -->
+    <div class="pf-setting">
+      <span class="pf-setting-label">In-page prompt assistant</span>
+      <label class="pf-toggle">
+        <input type="checkbox" id="pf-writing-toggle" checked>
+        <span class="pf-toggle-track">
+          <span class="pf-toggle-thumb"></span>
+        </span>
+      </label>
+    </div>
+
+    <!-- Default compression level for the in-page assistant -->
+    <div class="pf-setting">
+      <span class="pf-setting-label">Default compression</span>
+      <select class="pf-select" id="pf-level-select" aria-label="Default compression level">
+        <option value="light">Light</option>
+        <option value="balanced">Balanced</option>
+        <option value="maximum">Maximum</option>
+      </select>
+    </div>
+
+    <!-- Analyze automatically while typing -->
+    <div class="pf-setting">
+      <span class="pf-setting-label">Analyze while typing</span>
+      <label class="pf-toggle">
+        <input type="checkbox" id="pf-auto-toggle" checked>
+        <span class="pf-toggle-track">
+          <span class="pf-toggle-thumb"></span>
+        </span>
+      </label>
+    </div>
+
+    <!-- Environmental estimates in the in-page assistant -->
+    <div class="pf-setting">
+      <span class="pf-setting-label">Show environmental estimates</span>
+      <label class="pf-toggle">
+        <input type="checkbox" id="pf-impact-toggle" checked>
+        <span class="pf-toggle-track">
+          <span class="pf-toggle-thumb"></span>
+        </span>
+      </label>
+    </div>
+
+    <!-- Animations (independent of, and additional to, the OS reduced-motion setting) -->
+    <div class="pf-setting">
+      <span class="pf-setting-label">Assistant animations</span>
+      <label class="pf-toggle">
+        <input type="checkbox" id="pf-motion-toggle" checked>
+        <span class="pf-toggle-track">
+          <span class="pf-toggle-thumb"></span>
+        </span>
+      </label>
+    </div>
+
+    <!-- Optimization mode: local by default, enhanced only when cloud analysis is on -->
+    <div class="pf-setting">
+      <span class="pf-setting-label">Optimization</span>
+      <span class="pf-setting-value" id="pf-ai-status">Processed locally</span>
+    </div>
+
+    <!-- Debug logging toggle (dev) -->
+    <div class="pf-setting">
+      <span class="pf-setting-label">Debug logging (dev)</span>
+      <label class="pf-toggle">
+        <input type="checkbox" id="pf-debug-toggle">
+        <span class="pf-toggle-track">
+          <span class="pf-toggle-thumb"></span>
+        </span>
+      </label>
+    </div>
+
+    <!-- Keyboard shortcut help -->
+    <div class="pf-hint">
+      Press <kbd>Alt</kbd>+<kbd>P</kbd> on a chat page to open the panel · drag the
+      capsule to move it · <a href="#" id="pf-reset-assistant">reset assistant preferences</a>.
+      Configure enhanced mode &amp; privacy in
+      <a href="#" id="pf-open-settings">dashboard settings</a>.
+    </div>
+
+    <!-- CTA -->
+    <div class="pf-actions">
+      <button class="pf-btn" id="pf-open-stats">
+        View Full Stats
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Privacy disclosure -->
+    <div class="pf-disclosure">
+      Everything is tracked locally on your device. The in-page assistant optimizes
+      prompts offline with the Token Cutter; draft text is only sent anywhere if you
+      turn on cloud analysis in Settings <em>and</em> choose enhanced mode. See the
+      <a href="../dashboard/index.html#/settings" target="_blank" rel="noopener">privacy policy</a>.
+    </div>
+
+  </div>
+  <script src="../lib/storage.js"></script>
+  <script src="../lib/proxyConfig.js"></script>
+  <script src="../lib/promptSize.js"></script>
+  <script src="../lib/formatters.js"></script>
+  <script src="../lib/assistantState.js"></script>
+  <script src="../lib/env/sources.js"></script>
+  <script src="../lib/env/profiles.js"></script>
+  <script src="../lib/env/factors.js"></script>
+  <script src="../lib/env/copy.js"></script>
+  <script src="../lib/estimator.js"></script>
+  <script src="../lib/models/catalog.js"></script>
+  <script src="../lib/models/present.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+.account-form { display: flex; flex-direction: column; gap: 12px; max-width: 360px; }
+
+.account-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  background: var(--bg-primary, #faf7f0);
+  border: 1px solid var(--border-subtle, rgba(0,0,0,0.08));
+  border-radius: 10px;
+  width: fit-content;
+}
+.account-tab {
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #5c4a3a);
+  cursor: pointer;
+}
+.account-tab.active {
+  background: var(--bg-secondary, #f5f0e8);
+  color: var(--text-primary, #2c1810);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.account-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border: 1px solid var(--border-subtle, rgba(0,0,0,0.12));
+  border-radius: 10px;
+  background: var(--accent-green, #5b7c3a);
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+}
+.account-btn:disabled { opacity: 0.6; cursor: default; }
+.account-btn.ghost { background: var(--bg-secondary, #f5f0e8); color: var(--text-primary, #2c1810); }
+.account-btn.danger { background: transparent; color: #a23b3b; border-color: rgba(162,59,59,0.35); }
+
+.account-panel { display: flex; flex-direction: column; gap: 14px; }
+.account-row { display: flex; align-items: center; gap: 10px; }
+.account-email { font-weight: 400; font-size: 12.5px; color: var(--text-muted, #8b7355); }
+.account-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Signed-in greeting: Token Footprint mark + "Hello, [Name]" */
+.account-greeting {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-subtle, #e8e0d0);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent-green, #5b7c3a) 6%, var(--bg-card, #fff));
+}
+.account-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--accent-green, #5b7c3a);
+  color: #fff;
+  flex-shrink: 0;
+}
+.account-greeting-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.account-hello {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary, #2c1810);
+  letter-spacing: -0.2px;
+}
+.account-name-edit {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: var(--text-muted, #8b7355);
+  font-size: 12.5px;
+  cursor: pointer;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+.account-name-edit:hover { color: var(--accent-green, #5b7c3a); }
+.account-name-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.account-name-form input {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 8px 11px;
+  border: 1px solid var(--border, #d4c5a9);
+  border-radius: 9px;
+  background: var(--bg-card, #fff);
+  color: var(--text-primary, #2c1810);
+  font-size: 13px;
+}
+.account-name-form input:focus { outline: none; border-color: var(--accent-green, #5b7c3a); }
+
+.account-msg {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 9px 12px;
+  border-radius: 10px;
+}
+.account-msg.ok  { background: rgba(91,124,58,0.12);  color: var(--accent-green, #5b7c3a); }
+.account-msg.err { background: rgba(162,59,59,0.10);  color: #a23b3b; }
+.account-msg.info{ background: rgba(46,107,138,0.10); color: var(--accent-blue, #2e6b8a); }
+
+.account-password-wrap { position: relative; display: flex; }
+.account-password-wrap input { flex: 1; padding-right: 40px !important; }
+.account-password-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #8b7355);
+  cursor: pointer;
+  border-radius: 6px;
+}
+.account-password-toggle:hover { background: var(--bg-secondary, #f5f0e8); color: var(--text-primary, #2c1810); }
+
+.account-password-rules {
+  list-style: none;
+  margin: -4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.account-password-rules li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted, #8b7355);
+}
+.account-password-rules li.met { color: var(--accent-green, #5b7c3a); }

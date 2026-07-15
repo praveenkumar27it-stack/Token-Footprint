@@ -1,0 +1,39 @@
+@import url('./fonts.css');
+
+:root {
+  --pf-bg-primary: #FAF7F0;
+  --pf-bg-secondary: #F5F0E8;
+  --pf-bg-tertiary: #EDE8DC;
+  --pf-bg-elevated: #E8E2D4;
+  --pf-bg-card: #FFFFFF;
+  --pf-text-primary: #2C1810;
+  --pf-text-secondary: #5C4A3A;
+  --pf-text-muted: #8B7355;
+  --pf-accent-green: #5B7C3A;
+  --pf-accent-blue: #2E6B8A;
+  --pf-accent-amber: #C17F24;
+  --pf-accent-red: #A0522D;
+  --pf-border: #D4C5A9;
+  --pf-border-subtle: #E8E0D0;
+  --pf-font-mono: 'JetBrains Mono', monospace;
+  --pf-font-sans: 'Source Serif 4', serif;
+  --pf-radius-sm: 8px;
+  --pf-radius: 12px;
+  --pf-radius-lg: 16px;
+  --pf-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --pf-shadow: 0 4px 24px rgba(44, 24, 16, 0.10);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--pf-font-sans);
+  background: var(--pf-bg-primary);
+  color: var(--pf-text-primary);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.local
+*.local
+
+# Backend secrets — never commit. (.env above already covers these; explicit for clarity.)
+Token-Footprint/supabase/.env
+Token-Footprint/stats-site/.env

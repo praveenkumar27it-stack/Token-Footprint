@@ -1,0 +1,211 @@
+import { Hash, Zap, Droplets, Wind, Clock, Eye, Calculator, Scissors, Layers, Repeat, Gauge, ShieldCheck, MonitorSmartphone, PencilLine, AlertTriangle, CloudSun } from 'lucide-react'
+import './Guide.css'
+
+const STATS = [
+  { icon: Hash, color: '#5b7c3a', name: 'Tokens', text: 'The pieces a model reads and writes — about ¾ of a word each. Your prompt and the reply both count. Everything else on the dashboard is derived from this number.' },
+  { icon: Zap, color: '#c17f24', name: 'Energy (Wh)', text: 'Electricity the data-center GPUs use to process those tokens, in watt-hours. As a rough feel, 1 Wh is about 20 minutes of a phone sitting on standby.' },
+  { icon: Droplets, color: '#2e6b8a', name: 'Water (mL)', text: 'Fresh water evaporated to cool the hardware, in millilitres — both at the data center and at the power plant that feeds it.' },
+  { icon: Wind, color: '#8b7355', name: 'CO₂ (g)', text: 'Grams of CO₂-equivalent from generating that electricity. The real figure depends on how clean the local grid is, so treat it as a mid-range estimate.' },
+  { icon: Clock, color: '#a0522d', name: 'Response time', text: 'How long the reply took to finish. A reply that streams slower than the platform’s usual speed is scaled up (within a cap), because slow replies usually did more work per token.' },
+]
+
+// Per 1,000 tokens. ChatGPT is the anchor; Claude is the anchor × 1.15.
+// Matches extension/lib/constants.js.
+const PER_1K = [
+  { platform: 'ChatGPT — GPT-4o baseline', energy: '1.06 Wh', water: '3.5 mL', co2: '0.38 g' },
+  { platform: 'Claude — 3.x Sonnet estimate', energy: '1.22 Wh', water: '4.1 mL', co2: '0.43 g' },
+]
+
+const TIPS = [
+  { icon: Scissors, title: 'Cut the padding', text: 'Greetings, “please/thank you”, and phrases like “I was wondering if you could…” add tokens without changing the answer. The built-in Energy Saver trims them and shows the difference before you send.' },
+  { icon: Layers, title: 'Batch related questions', text: 'One prompt with three questions costs less than three separate chats, because you don’t re-send the context each time.' },
+  { icon: Repeat, title: 'Refine instead of regenerating', text: 'Every “regenerate” runs the whole reply again. Adjusting the prompt is usually cheaper than rerolling.' },
+  { icon: Gauge, title: 'Match the mode to the task', text: 'Reasoning or “thinking” modes can cost several times more per answer. Use them when the problem actually needs them.' },
+  { icon: Scissors, title: 'Ask for less output', text: 'Replies are usually longer than prompts. “Give me three bullets” or “just the code” keeps the response short.' },
+]
+
+const LIMITS = [
+  'These are estimates to build intuition, not meter readings.',
+  'Token counts are approximated from text length and can be off by roughly 15% — more for code or non-English text.',
+  'Claude’s numbers are inferred from ChatGPT’s, because Anthropic doesn’t publish per-prompt energy or water figures.',
+  'Response time includes network and queue delays, not just the model’s compute, so the time adjustment is capped at 3×.',
+  'We can’t see provider-side batching, caching, or which hardware ran the request.',
+  'The heatwave adjustment uses the nearest known cloud region as a proxy — real request routing isn’t public — and reads weather near that region, not the exact data center.',
+]
+
+export default function Guide() {
+  return (
+    <div className="guide-page">
+      <div className="page-header">
+        <h1 className="page-title">How Token Footprint Works</h1>
+        <p className="page-subtitle">What the numbers mean, how they’re calculated, and where the estimates end.</p>
+      </div>
+
+      {/* What each number means */}
+      <section className="guide-section">
+        <h2 className="guide-h2">What each number means</h2>
+        <div className="guide-cards">
+          {STATS.map((s) => (
+            <div className="guide-card" key={s.name}>
+              <div className="guide-card-icon" style={{ background: `${s.color}18`, color: s.color }}>
+                <s.icon size={18} />
+              </div>
+              <div>
+                <div className="guide-card-name">{s.name}</div>
+                <p className="guide-card-text">{s.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Measured vs estimated */}
+      <section className="guide-section">
+        <h2 className="guide-h2">What’s measured and what’s estimated</h2>
+        <div className="guide-split">
+          <div className="guide-split-card">
+            <div className="guide-split-head"><Eye size={16} /> Observed on your device</div>
+            <ul className="guide-list">
+              <li>The length of your prompt and the reply — used only to count characters, never saved or sent anywhere.</li>
+              <li>How long each reply took to stream.</li>
+            </ul>
+          </div>
+          <div className="guide-split-card">
+            <div className="guide-split-head"><Calculator size={16} /> Estimated from that</div>
+            <ul className="guide-list">
+              <li>Token counts, from character length (about 4 characters per token).</li>
+              <li>Energy, water, and CO₂, from published per-token figures.</li>
+            </ul>
+          </div>
+        </div>
+        <p className="guide-note">None of these are direct measurements of your specific request. They’re a transparent, defensible estimate — good for spotting trends, not for auditing a data center.</p>
+      </section>
+
+      {/* How the estimate is built */}
+      <section className="guide-section">
+        <h2 className="guide-h2">How the estimate is built</h2>
+        <p className="guide-lead">Three steps turn a prompt into a footprint:</p>
+        <ol className="guide-steps">
+          <li><strong>Count the tokens.</strong> The character length of the prompt and reply is divided by four — the rough average for the GPT-4 tokenizer. This happens in your browser; the text itself is never uploaded.</li>
+          <li><strong>Multiply by a per-token cost.</strong> ChatGPT is the anchor: OpenAI’s 2025 sustainability figures, divided by an estimate of yearly tokens, work out to roughly 1.06 Wh, 3.5 mL of water, and 0.38 g of CO₂ per 1,000 tokens. Anthropic publishes no figures, so Claude is set 15% above the ChatGPT anchor.</li>
+          <li><strong>Adjust for effort.</strong> A reply slower than the platform’s normal speed is scaled up, capped at 3×. Faster replies are never scaled below 1×.</li>
+        </ol>
+
+        <div className="guide-table-wrap">
+          <table className="guide-table">
+            <thead>
+              <tr><th>Platform</th><th>Energy / 1k tokens</th><th>Water / 1k tokens</th><th>CO₂ / 1k tokens</th></tr>
+            </thead>
+            <tbody>
+              {PER_1K.map((r) => (
+                <tr key={r.platform}>
+                  <td>{r.platform}</td>
+                  <td><code>{r.energy}</code></td>
+                  <td><code>{r.water}</code></td>
+                  <td><code>{r.co2}</code></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="guide-formula">
+          impact = tokens × per-token cost × time factor
+        </div>
+      </section>
+
+      {/* Weather adjustment */}
+      <section className="guide-section">
+        <h2 className="guide-h2"><CloudSun size={18} className="guide-h2-icon" /> When hot weather changes the estimate</h2>
+        <p className="guide-lead">
+          The per-token costs above bake in a data center’s <em>average</em>
+          cooling overhead for the year. That average hides a real problem: in hot
+          weather, cooling demand spikes. A site that normally runs at a power usage
+          effectiveness (PUE) of about 1.1 — roughly 10% overhead on top of the
+          computing itself — can climb toward 1.3–1.4 in extreme heat, which means
+          three to four times the cooling power. Hot spells also strain the grid the
+          data center draws from, since thermal and nuclear plants lose capacity when
+          the water they rely on runs warm.
+        </p>
+        <p className="guide-lead">
+          So the same prompt can carry more energy and water on a scorching
+          afternoon than on a mild one. If you share a rough location, Token Footprint
+          reads the current weather near the closest known cloud region and shows a
+          weather-adjusted figure when it’s warranted. One honest caveat: we can’t see
+          which data center actually served your request — that routing isn’t public —
+          so this always uses the <strong>nearest known cloud region as a proxy</strong>
+          and is clearly marked as an approximation. You can turn it on from the{' '}
+          <strong>Weather-aware estimate</strong> card on the Weekly Stats page.
+        </p>
+      </section>
+
+      {/* Token savings */}
+      <section className="guide-section">
+        <h2 className="guide-h2">How savings are counted</h2>
+        <p className="guide-lead">
+          When the Energy Saver suggests a shorter prompt and you click <strong>Apply</strong>, Token Footprint
+          compares the token count before and after and records the difference. Suggestions you ignore don’t
+          count, and applying the same fix twice doesn’t count twice — so the Savings page reflects real,
+          one-time reductions.
+        </p>
+      </section>
+
+      {/* Reduce your use */}
+      <section className="guide-section">
+        <h2 className="guide-h2">Ways to use fewer tokens</h2>
+        <div className="guide-tips">
+          {TIPS.map((t) => (
+            <div className="guide-tip" key={t.title}>
+              <t.icon size={18} className="guide-tip-icon" />
+              <div>
+                <div className="guide-tip-title">{t.title}</div>
+                <p className="guide-tip-text">{t.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Privacy */}
+      <section className="guide-section">
+        <h2 className="guide-h2"><ShieldCheck size={20} className="guide-h2-icon" /> Local-first by default</h2>
+        <p className="guide-lead">
+          Everything above runs on your device. Token counts and the numbers derived from them live in your
+          browser’s local storage; your prompts and the replies are never saved or uploaded. The one exception
+          is optional: if you turn on AI writing help, the draft you’re typing is sent to a Cloudflare Worker you
+          set up, which passes it to Gemini for a suggestion. It stays off until you add that URL. The Settings
+          page has the full breakdown.
+        </p>
+      </section>
+
+      {/* Platforms + writing assistant */}
+      <section className="guide-section">
+        <div className="guide-split">
+          <div className="guide-split-card">
+            <div className="guide-split-head"><MonitorSmartphone size={16} /> Supported platforms</div>
+            <p className="guide-split-text">
+              Token Footprint tracks ChatGPT (chatgpt.com and chat.openai.com) and Claude (claude.ai). Other
+              sites are left alone.
+            </p>
+          </div>
+          <div className="guide-split-card">
+            <div className="guide-split-head"><PencilLine size={16} /> Writing assistant</div>
+            <p className="guide-split-text">
+              The offline checker — spelling, capitalization, punctuation, repeated words — always runs in your
+              browser. The optional Gemini layer rewrites for clarity and tone, and only runs if you’ve set up
+              the Worker. If it’s off or unreachable, the offline checks still work.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Limitations */}
+      <section className="guide-section">
+        <h2 className="guide-h2"><AlertTriangle size={20} className="guide-h2-icon" /> Limitations</h2>
+        <ul className="guide-list guide-limits">
+          {LIMITS.map((l, i) => <li key={i}>{l}</li>)}
+        </ul>
+      </section>
+    </div>
+  )
+}

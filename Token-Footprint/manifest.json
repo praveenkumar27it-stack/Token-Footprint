@@ -1,0 +1,101 @@
+{
+  "name": "Token Footprint",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "Visualize the environmental impact of every AI prompt — energy, water, and CO2",
+  "permissions": ["storage", "activeTab", "alarms", "geolocation"],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://*.workers.dev/*",
+    "https://cpwbtulpufhqexrrzjzt.supabase.co/*",
+    "https://api.open-meteo.com/*",
+    "https://geocoding-api.open-meteo.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'none'; worker-src 'self'; connect-src 'self' https://*.workers.dev https://cpwbtulpufhqexrrzjzt.supabase.co https://api.open-meteo.com https://geocoding-api.open-meteo.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; frame-src 'none';"
+  },
+  "background": {
+    "service_worker": "extension/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*"
+      ],
+      "js": [
+        "extension/lib/storage.js",
+        "extension/lib/proxyConfig.js",
+        "extension/lib/platforms.js",
+        "extension/lib/constants.js",
+        "extension/lib/tokenEstimator.js",
+        "extension/lib/environmentalModel.js",
+        "extension/lib/env/sources.js",
+        "extension/lib/env/profiles.js",
+        "extension/lib/env/factors.js",
+        "extension/lib/env/copy.js",
+        "extension/lib/estimator.js",
+        "extension/lib/models/catalog.js",
+        "extension/lib/models/reasoning.js",
+        "extension/lib/models/observation.js",
+        "extension/lib/models/discovery.js",
+        "extension/lib/models/adapters/shared.js",
+        "extension/lib/models/adapters/openai.js",
+        "extension/lib/models/adapters/anthropic.js",
+        "extension/lib/models/adapters/google.js",
+        "extension/lib/models/adapters/index.js",
+        "extension/lib/models/detector.js",
+        "extension/lib/models/snapshots.js",
+        "extension/lib/models/present.js",
+        "extension/lib/writingFormat.js",
+        "extension/lib/uiHelpers.js",
+        "extension/lib/formatters.js",
+        "extension/lib/tokenCutter.bundle.js",
+        "extension/lib/composer.js",
+        "extension/lib/assistantState.js",
+        "extension/overlay/assistant.js",
+        "extension/content.js"
+      ],
+      "css": [
+        "extension/styles/fonts.css",
+        "extension/overlay/floating.css",
+        "extension/overlay/modal.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "extension/popup/popup.html",
+    "default_icon": {
+      "48": "Images/PF_Icon(48).png",
+      "128": "Images/PF_Icon(128).png"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "extension/overlay/assistant.css",
+        "extension/fonts/SourceSerif4-400.woff2",
+        "extension/fonts/SourceSerif4-600.woff2",
+        "extension/fonts/JetBrainsMono-500.woff2",
+        "extension/fonts/JetBrainsMono-600.woff2"
+      ],
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*"
+      ]
+    }
+  ],
+  "options_page": "extension/dashboard/index.html",
+  "icons": {
+    "48": "Images/PF_Icon(48).png",
+    "128": "Images/PF_Icon(128).png"
+  }
+}
